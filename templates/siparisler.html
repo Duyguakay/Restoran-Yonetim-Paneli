@@ -3,104 +3,134 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Siparişler | Maya</title>
+    <title>Siparişler | MAYA</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=DM+Sans:wght@400;500&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        .urun-select {
-            background: #0d0d0b;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            width: 100%;
-            margin-bottom: 10px;
-        }
-
-        .adet-input {
-            background: #0d0d0b;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            width: 60px;
-        }
-
-        .btn-ekle {
-            background: #c9a84c;
-            color: black;
-            border: none;
-            padding: 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
-            width: 100%;
-            transition: 0.3s;
-        }
-
-        .btn-ekle:hover {
-            opacity: 0.8;
-        }
-    </style>
+    <link rel="stylesheet" href="../static/style.css">
 </head>
 
 <body>
     <aside class="sidebar">
         <div class="logo" style="padding: 30px 25px;">
             <div style="font-family: 'Playfair Display'; font-size: 24px; color: #c9a84c;">MAYA</div>
-            <div style="font-size: 10px; color: #8a8778; letter-spacing: 2px;">YÖNETİM</div>
         </div>
         <nav>
-            <a href="/" class="nav-item {% if sayfa == 'genel' %}active{% endif %}">Genel Bakış</a>
-            <a href="/masalar" class="nav-item {% if sayfa == 'masa' %}active{% endif %}">Masalar</a>
-            <a href="/musteriler" class="nav-item {% if sayfa == 'musteri' %}active{% endif %}">Müşteriler</a>
-            <a href="/menu" class="nav-item {% if sayfa == 'menu' %}active{% endif %}">Menü / Ürünler</a>
-            <a href="/siparisler" class="nav-item {% if sayfa == 'siparis' %}active{% endif %}">Siparişler</a>
+            <a href="/" class="nav-item">📊 Genel Bakış</a>
+            <a href="/masalar" class="nav-item">🪑 Masalar</a>
+            <a href="/musteriler" class="nav-item">👥 Müşteriler</a>
+            <a href="/menu" class="nav-item">🍽️ Menü / Ürünler</a>
+            <a href="/siparisler" class="nav-item active">🧾 Siparişler</a>
         </nav>
     </aside>
 
-    <main class="main" style="flex: 1; margin-left: 240px; padding: 40px;">
-        <h2 style="font-family: 'Playfair Display'; color: #c9a84c; margin-bottom: 25px;">Aktif Adisyonlar</h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+    <main class="main" style="margin-left: 240px; padding: 40px; flex: 1;">
+        <h2 style="font-family: 'Playfair Display'; color: #c9a84c; margin-bottom: 30px;">🧾 Tüm Masalar ve Aktif
+            Adisyonlar</h2>
 
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div
+            style="padding: 15px; margin-bottom: 20px; border-radius: 8px; background: #2e7d32#c0453a; color: white; font-weight: bold;">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% if siparisler %}
+        <div style="display: grid; gap: 30px;">
             {% for s in siparisler %}
-            <div class="card"
-                style="background: #151512; border: 1px solid rgba(255,255,255,0.07); padding: 20px; border-radius: 12px;">
-                <div style="font-size: 11px; color: #8a8778;">ADİSYON NO: #S-{{ s.Siparis_Id }}</div>
-                <h3 style="color: #c9a84c; margin: 10px 0;">Masa {{ s.Masa_Id }} <span
-                        style="font-size: 12px; color:#8a8778;">({{ s.Konum }})</span></h3>
+            <div
+                style="background: #151512; border: 1px solid rgba(255,255,255,0.1); padding: 25px; border-radius: 12px;">
 
-                <div style="font-size: 28px; font-weight: bold; margin: 15px 0;">₺{{ s.Tutar }}</div>
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 15px;">
+                    <div>
+                        <h3 style="color: #c9a84c; margin: 0;">Masa {{ s.Masa_Id }} - {{ s.Konum }}</h3>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <div style="font-size: 20px; font-weight: bold; color: white;">Toplam: <span
+                                style="color: #c9a84c;">₺{{ s.Tutar }}</span></div>
 
-                <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.05); margin: 15px 0;">
+                        {% if s.Siparis_Id %}
+                        <form action="/adisyon-kapat/{{ s.Siparis_Id }}" method="POST"
+                            onsubmit="return confirm('Ödeme alındı mı? Masa adisyonu kapatılacak ve masa boşaltılacaktır.');">
+                            <button type="submit"
+                                style="background: #c0453a; color: white; border: none; padding: 10px 15px; font-weight: bold; cursor: pointer; border-radius: 5px; font-size: 13px;">💳
+                                HESABI KAPAT / TEMİZLE</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
 
-                <h4 style="font-size: 12px; color: #8a8778; margin-bottom: 10px;">Siparişe Ürün Ekle</h4>
-
-                <form action="/urune_ekle" method="POST" style="display: flex; flex-direction: column; gap: 8px;">
-                    <input type="hidden" name="siparis_id" value="{{ s.Siparis_Id }}">
-
-                    <select name="urun_id" class="urun-select" required>
-                        <option value="" disabled selected>Ürün Seçin...</option>
+                <form action="/adisyon-urun-ekle/{{ s.Masa_Id }}" method="POST"
+                    style="display: flex; gap: 10px; margin-bottom: 20px; background: #0d0d0b; padding: 10px; border-radius: 8px;">
+                    <select name="urun_id" required
+                        style="flex: 2; padding: 10px; background: #1c1c18; color: white; border: 1px solid #333; border-radius: 5px;">
+                        <option value="">+ Bu Masaya Ürün Ekle...</option>
                         {% for u in urunler %}
-                        <option value="{{ u.Urun_Id }}">{{ u.Urun_Adi }} - ₺{{ u.Fiyat }}</option>
+                        <option value="{{ u.urun_id }}">{{ u.urun_adi }} (₺{{ u.fiyat }})</option>
                         {% endfor %}
                     </select>
-
-                    <div style="display: flex; gap: 8px;">
-                        <input type="number" name="adet" value="1" min="1" class="adet-input" required>
-                        <button type="submit" class="btn-ekle">+ EKLE</button>
-                    </div>
+                    <input type="number" name="adet" value="1" min="1"
+                        style="width: 80px; padding: 10px; background: #1c1c18; color: white; border: 1px solid #333; border-radius: 5px; text-align: center;">
+                    <button type="submit"
+                        style="background: #c9a84c; color: black; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; border-radius: 5px;">EKLE</button>
                 </form>
 
+                {% if s.Kalemler %}
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="color: #8a8778; font-size: 12px; border-bottom: 1px solid #333;">
+                            <th style="padding: 10px 0;">Ürün</th>
+                            <th style="padding: 10px 0; text-align: center;">Adet</th>
+                            <th style="padding: 10px 0; text-align: right;">Birim Fiyat</th>
+                            <th style="padding: 10px 0; text-align: right;">Ara Toplam</th>
+                            <th style="padding: 10px 0; text-align: right; width: 50px;">Sil</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for k in s.Kalemler %}
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 15px 0; color: white;">{{ k.Urun_Adi }}</td>
+                            <td style="padding: 15px 0; text-align: center;">
+                                <form action="/siparis-adet-guncelle/{{ k.Detay_Id }}" method="POST"
+                                    style="display: inline-flex; align-items: center; gap: 5px;">
+                                    <input type="number" name="adet" value="{{ k.Adet }}" min="1"
+                                        style="width: 50px; background: #0d0d0b; color: white; border: 1px solid #333; text-align: center; border-radius: 4px; padding: 5px;">
+                                    <button type="submit"
+                                        style="background: none; border: none; cursor: pointer; font-size: 18px;"
+                                        title="Adeti Kaydet">💾</button>
+                                </form>
+                            </td>
+                            <td style="padding: 15px 0; text-align: right; color: #8a8778;">₺{{ k.Fiyat }}</td>
+                            <td style="padding: 15px 0; text-align: right; font-weight: bold; color: #c9a84c;">₺{{
+                                k.Ara_Toplam }}</td>
+                            <td style="padding: 15px 0; text-align: right;">
+                                <form action="/siparis-detay-sil/{{ k.Detay_Id }}" method="POST">
+                                    <button type="submit"
+                                        style="background: none; border: none; color: #c0453a; cursor: pointer; font-weight: bold; font-size: 16px;">✕</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div style="color: #666; font-style: italic; font-size: 13px; padding: 5px 0;">Bu masada henüz açık bir
+                    adisyon veya sipariş bulunmuyor. Yukarıdan ürün ekleyerek adisyonu başlatabilirsiniz.</div>
+                {% endif %}
             </div>
             {% endfor %}
-
         </div>
+        {% else %}
+        <div
+            style="background: #151512; border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 12px; text-align: center; color: #8a8778;">
+            Sistemde kayıtlı masa bulunamadı.
+        </div>
+        {% endif %}
     </main>
 </body>
 
