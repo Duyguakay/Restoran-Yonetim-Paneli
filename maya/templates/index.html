@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>MAYA | Panel</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=DM+Sans:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-name">MAYA</div>
+            <div class="logo-sub">Yönetim Sistemi</div>
+        </div>
+        <nav>
+            <a href="/" class="nav-item active">📊 Genel Bakış</a>
+            <a href="/masalar" class="nav-item">🪑 Masalar</a>
+            <a href="/musteriler" class="nav-item">👥 Müşteriler</a>
+            <a href="/menu" class="nav-item">🍽️ Menü / Ürünler</a>
+            <a href="/siparisler" class="nav-item">🧾 Siparişler</a>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <h1 style="font-family: 'Playfair Display'; color: var(--gold); text-align: center; margin-bottom: 30px;">MAYA
+            RESTORAN</h1>
+
+        <div class="card">
+            <h2 style="font-family: 'Playfair Display'; color: var(--gold); margin-bottom: 20px;">📅 Hızlı Rezervasyon
+                Oluştur</h2>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div id="flash-container"
+                style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: grid; gap: 10px; min-width: 300px;">
+                {% for category, message in messages %}
+                <div class="flash-message"
+                    style="padding: 15px 20px; border-radius: 8px; background: #2e7d32#c0453a; color: white; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; font-family: 'DM Sans', sans-serif;">
+                    <span>{{ message }}</span>
+                    <button onclick="this.parentElement.remove()"
+                        style="background: none; border: none; color: white; font-weight: bold; cursor: pointer; margin-left: 15px; font-size: 16px;">✕</button>
+                </div>
+                {% endfor %}
+            </div>
+
+            <script>
+                setTimeout(function () {
+                    var container = document.getElementById('flash-container');
+                    if (container) {
+                        container.style.transition = "opacity 0.5s ease";
+                        container.style.opacity = "0";
+                        setTimeout(function () { container.remove(); }, 500);
+                    }
+                }, 5000); // 5 saniye sonra otomatik kapanır
+            </script>
+            {% endif %}
+            {% endwith %}
+
+            <form id="rezervasyonForm" action="/rezervasyon-olustur" method="POST"
+                style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                <input type="text" name="ad" placeholder="Ad" required
+                    style="padding: 12px; background: #0d0d0b; border: 1px solid #333; color: white; border-radius: 6px;">
+                <input type="text" name="soyad" placeholder="Soyad" required
+                    style="padding: 12px; background: #0d0d0b; border: 1px solid #333; color: white; border-radius: 6px;">
+                <input type="text" name="telefon" placeholder="Telefon" required
+                    style="padding: 12px; background: #0d0d0b; border: 1px solid #333; color: white; border-radius: 6px;">
+                <input type="date" name="tarih" required
+                    style="padding: 12px; background: #0d0d0b; border: 1px solid #333; color: white; border-radius: 6px;">
+                <input type="time" name="saat" required
+                    style="padding: 12px; background: #0d0d0b; border: 1px solid #333; color: white; border-radius: 6px;">
+                <input type="number" id="kisi_sayisi" name="kisi_sayisi" placeholder="Kişi Sayısı" min="1" required
+                    style="padding: 12px; background: #0d0d0b; border: 1px solid #333; color: white; border-radius: 6px;">
+                <input type="number" id="masa_id" name="masa_id" placeholder="Masa No" required
+                    style="padding: 12px; background: #0d0d0b; border: 1px solid #333; color: white; border-radius: 6px;">
+
+                <button type="submit"
+                    style="grid-column: span 3; padding: 15px; background: var(--gold); border: none; color: black; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.3s;">
+                    REZERVASYONU KAYDET
+                </button>
+            </form>
+        </div>
+
+        <h2 style="font-family: 'Playfair Display'; color: var(--gold); margin: 30px 0 20px;">🪑 Kat Planı & Masa
+            Durumları</h2>
+        <div class="tables-grid">
+            {% for m in masalar %}
+            <div class="table-slot {{ m.durum }}">
+                <div style="font-size: 12px; color: var(--muted);">MASA</div>
+                <div style="font-size: 24px; font-weight: bold; font-family: 'Playfair Display';">{{ m.Masa_ID }}</div>
+                <div style="font-size: 10px; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px;">{{
+                    m.durum }}</div>
+                <div style="font-size: 9px; color: var(--muted); margin-top: 4px;">Kap: {{ m.Kapasite }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+</body>
+
+</html>

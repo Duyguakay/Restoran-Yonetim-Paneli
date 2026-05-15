@@ -1,0 +1,143 @@
+:root {
+    --bg: #0d0d0b;
+    --surface: #151512;
+    --surface2: #1c1c18;
+    --border: rgba(255, 255, 255, 0.07);
+    --gold: #c9a84c;
+    --text: #f0ece2;
+    --muted: #8a8778;
+    --danger: #c0453a;
+    --success: #4a9e6b;
+    --radius: 12px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    min-height: 100vh;
+}
+
+/* SIDEBAR - SABİT VE ŞIK */
+.sidebar {
+    width: 240px;
+    height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+}
+
+.logo {
+    padding: 30px 25px;
+    border-bottom: 1px solid var(--border);
+}
+
+.logo-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    color: var(--gold);
+}
+
+.logo-sub {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 25px;
+    color: var(--muted);
+    text-decoration: none;
+    transition: 0.2s;
+    font-size: 14px;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    background: rgba(201, 168, 76, 0.1);
+    color: var(--gold);
+}
+
+/* ANA ALAN */
+.main {
+    flex: 1;
+    margin-left: 240px;
+    padding: 40px;
+}
+
+.card {
+    background: var(--surface);
+    padding: 30px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    margin-bottom: 25px;
+}
+
+/* MASALAR - KAYMAYI ÖNLEYEN YAPI */
+.tables-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+}
+
+.table-slot {
+    aspect-ratio: 1 / 1;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface2);
+    transition: border-color 0.3s, background 0.3s;
+    /* Büyüme (scale) kaldırıldı */
+}
+
+.table-slot.bos {
+    opacity: 0.6;
+}
+
+.table-slot.dolu {
+    border: 2px solid var(--gold) !important;
+    background: rgba(201, 168, 76, 0.1) !important;
+}
+
+.table-slot.rezerve {
+    border: 2px solid var(--success) !important;
+    background: rgba(74, 158, 107, 0.1) !important;
+}
+
+/* TABLO TASARIMI */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    text-align: left;
+    padding: 15px;
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+}
+
+td {
+    padding: 15px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+}

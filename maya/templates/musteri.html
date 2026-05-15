@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Müşteriler | Maya</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=DM+Sans:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .upd-input {
+            background: #0d0d0b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            width: 100px;
+        }
+
+        .btn-guncelle {
+            background: #c9a84c;
+            color: black;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .btn-sil {
+            background: #c0453a;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+    </style>
+</head>
+
+<body>
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-name">MAYA</div>
+            <div class="logo-sub">Yönetim Sistemi</div>
+        </div>
+        <nav>
+            <a href="/" class="nav-item">📊 Genel Bakış</a>
+            <a href="/masalar" class="nav-item">🪑 Masalar</a>
+            <a href="/musteriler" class="nav-item active">👥 Müşteriler</a>
+            <a href="/menu" class="nav-item">🍽️ Menü / Ürünler</a>
+            <a href="/siparisler" class="nav-item">🧾 Siparişler</a>
+        </nav>
+    </aside>
+
+    <main class="main" style="flex: 1; margin-left: 240px; padding: 40px;">
+        <div class="card"
+            style="background: #151512; border: 1px solid rgba(255,255,255,0.07); padding: 25px; border-radius: 12px;">
+            <h2 style="font-family: 'Playfair Display'; color: #c9a84c; margin-bottom: 25px;">Müşteri Yönetimi</h2>
+
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <th style="padding: 15px; font-size: 11px; color: #8a8778; text-align: left;">ID</th>
+                        <th style="padding: 15px; font-size: 11px; color: #8a8778; text-align: left;">AD SOYAD</th>
+                        <th style="padding: 15px; font-size: 11px; color: #8a8778; text-align: left;">GÜNCELLE (Tarih |
+                            Saat | Masa)</th>
+                        <th style="padding: 15px; font-size: 11px; color: #8a8778; text-align: left;">İŞLEM</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in musteriler %}
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+                        <td style="padding: 15px; color: #8a8778;">#{{ loop.index }}</td>
+
+                        <td style="padding: 15px;">{{ m.Ad }} {{ m.Soyad }}</td>
+
+                        <td style="padding: 15px;">
+                            <form action="/rezervasyon_guncelle/{{ m.Musteri_ID }}" method="POST"
+                                style="display: flex; gap: 8px;">
+                                <input type="date" name="tarih" class="upd-input"
+                                    value="{{ m.Tarih.strftime('%Y-%m-%d') if m.Tarih else '' }}" required>
+
+                                <input type="time" name="saat" class="upd-input" style="width: 70px;"
+                                    value="{{ m.Tarih.strftime('%H:%M') if m.Tarih else '' }}" required>
+
+                                <input type="number" name="masa_id" placeholder="Masa" class="upd-input"
+                                    style="width: 50px;" value="{{ m.Masa_ID if m.Masa_ID else '' }}" required>
+
+                                <button type="submit" class="btn-guncelle">KAYDET</button>
+                            </form>
+                        </td>
+
+                        <td style="padding: 15px;">
+                            <form action="/musteri_sil/{{ m.Musteri_ID }}" method="POST">
+                                <button type="submit" class="btn-sil"
+                                    onclick="return confirm('Müşteriyi ve rezervasyonunu silmek istediğinize emin misiniz?')">SİL</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+
+</html>

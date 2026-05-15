@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Menü | MAYA</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=DM+Sans:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+
+<body>
+    <aside class="sidebar">
+        <div class="logo" style="padding: 30px 25px;">
+            <div style="font-family: 'Playfair Display'; font-size: 24px; color: #c9a84c;">MAYA</div>
+        </div>
+        <nav>
+            <a href="/" class="nav-item">📊 Genel Bakış</a>
+            <a href="/masalar" class="nav-item">🪑 Masalar</a>
+            <a href="/musteriler" class="nav-item">👥 Müşteriler</a>
+            <a href="/menu" class="nav-item active">🍽️ Menü / Ürünler</a>
+            <a href="/siparisler" class="nav-item">🧾 Siparişler</a>
+        </nav>
+    </aside>
+
+    <main class="main" style="margin-left: 240px; padding: 40px; flex: 1;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div
+            style="padding: 15px; margin-bottom: 20px; border-radius: 8px; background: #c9a84c; color: black; font-weight: bold;">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <div class="card"
+            style="background: #151512; padding: 25px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px;">
+            <h3 style="color: #c9a84c; margin-top: 0;">➕ Yeni Ürün Ekle</h3>
+            <form action="/urun-ekle" method="POST" style="display: flex; flex-direction: column; gap: 15px;">
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" name="urun_adi" placeholder="Ürün Adı" required
+                        style="flex: 2; padding: 12px; background: #0d0d0b; border: 1px solid #333; color: white;">
+                    <input type="number" step="0.01" name="fiyat" placeholder="Fiyat" required
+                        style="flex: 1; padding: 12px; background: #0d0d0b; border: 1px solid #333; color: white;">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" name="aciklama" placeholder="Ürün Açıklaması (Örn: Kıtır ekmek ve limon ile)"
+                        style="flex: 1; padding: 12px; background: #0d0d0b; border: 1px solid #333; color: white;">
+                    <button type="submit"
+                        style="padding: 12px 25px; background: #c9a84c; color: black; border: none; font-weight: bold; cursor: pointer; min-width: 120px;">EKLE</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card"
+            style="background: #151512; padding: 25px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+            <h3 style="color: #c9a84c; margin-top: 0;">🍽️ Menü Listesi</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px; text-align: left;">
+                <thead>
+                    <tr style="color: #8a8778; font-size: 13px; border-bottom: 1px solid #333;">
+                        <th style="padding: 10px; width: 80px;">ID</th>
+                        <th style="padding: 10px;">ÜRÜN ADI & AÇIKLAMA</th>
+                        <th style="padding: 10px; width: 350px;">BİLGİLERİ GÜNCELLE</th>
+                        <th style="padding: 10px; text-align: right; width: 100px;">İŞLEM</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in urunler %}
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+                        <td style="padding: 15px 10px; color: #8a8778; vertical-align: middle;">#{{ u.urun_id }}</td>
+                        <td style="padding: 15px 10px; vertical-align: middle;">
+                            <div style="font-weight: 500; color: white;">{{ u.urun_adi }}</div>
+                            {% if u.aciklama %}
+                            <div style="font-size: 12px; color: #8a8778; margin-top: 4px; font-style: italic;">{{
+                                u.aciklama }}</div>
+                            {% else %}
+                            <div style="font-size: 12px; color: #444; margin-top: 4px; font-style: italic;">Açıklama yok
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 15px 10px; vertical-align: middle;">
+                            <form action="/urun-guncelle/{{ u.urun_id }}" method="POST"
+                                style="display: flex; align-items: center; gap: 8px;">
+                                <input type="number" step="0.01" name="fiyat" value="{{ u.fiyat }}" title="Fiyat"
+                                    style="width: 80px; padding: 8px; background: #0d0d0b; color: #c9a84c; border: 1px solid #333; border-radius: 4px; font-weight: bold;">
+                                <input type="text" name="aciklama" value="{{ u.aciklama or '' }}"
+                                    placeholder="Açıklama güncelle..."
+                                    style="flex: 1; padding: 8px; background: #0d0d0b; color: white; border: 1px solid #333; border-radius: 4px; font-size: 13px;">
+                                <button type="submit"
+                                    style="background: none; border: none; font-size: 18px; cursor: pointer;"
+                                    title="Değişiklikleri Kaydet">💾</button>
+                            </form>
+                        </td>
+                        <td style="padding: 15px 10px; text-align: right; vertical-align: middle;">
+                            <form action="/urun-sil/{{ u.urun_id }}" method="POST"
+                                onsubmit="return confirm('Bu ürünü silmek istediğinize emin misiniz?');">
+                                <button type="submit"
+                                    style="background: none; border: none; color: #c0453a; cursor: pointer; font-weight: bold;">✕
+                                    SİL</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+
+</html>
