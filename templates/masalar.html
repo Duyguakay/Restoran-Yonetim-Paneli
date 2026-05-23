@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Masalar | MAYA</title>
+    <title>Masalar | RESTORAN</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=DM+Sans:wght@400;500&display=swap"
         rel="stylesheet">
@@ -13,7 +13,7 @@
 <body>
     <aside class="sidebar">
         <div class="logo">
-            <div class="logo-name">MAYA</div>
+            <div class="logo-name">RESTORAN</div>
             <div class="logo-sub">Yönetim Sistemi</div>
         </div>
         <nav>
@@ -87,12 +87,12 @@
                 <tbody>
                     {% for m in masalar %}
                     <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); color: white;">
-                        <td style="padding: 15px; font-weight: bold;">Masa {{ m.Masa_ID }}</td>
+                        <td style="padding: 15px; font-weight: bold;">Masa {{ m.Masa_Id }}</td>
                         <td style="padding: 15px;">{{ m.Kapasite }} Kişilik</td>
                         <td style="padding: 15px; color: #8a8778;">{{ m.Konum }}</td>
                         <td style="padding: 15px; text-align: right;">
-                            <form action="/masa-sil/{{ m.Masa_ID }}" method="POST"
-                                onsubmit="return confirm('Masa {{ m.Masa_ID }}\'yi sistemden tamamen silmek istediğinize emin misiniz?');"
+                            <form action="/masa-sil/{{ m.Masa_Id }}" method="POST"
+                                onsubmit="return confirm('Masa {{ m.Masa_Id }}\'yi sistemden tamamen silmek istediğinize emin misiniz?');"
                                 style="display: inline;">
                                 <button type="submit"
                                     style="background: #c0453a; color: white; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 12px; transition: 0.3s;">

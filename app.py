@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 load_dotenv(dotenv_path="pass.env")
 app = Flask(__name__)
-app.secret_key = "maya_ozel_anahtar"
+app.secret_key = "RESTORAN_ozel_anahtar"
 
 def get_db():
     return mysql.connector.connect(
@@ -20,17 +20,17 @@ def get_db():
 def index():
     db = get_db()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM MASA ORDER BY Masa_ID ASC")
+    cursor.execute("SELECT * FROM MASA ORDER BY Masa_Id ASC")
     masalar = cursor.fetchall()
     simdi = datetime.now()
     bugun_bas = simdi.replace(hour=0, minute=0, second=0)
     bugun_bit = simdi.replace(hour=23, minute=59, second=59)
-    cursor.execute("SELECT Masa_ID, Tarih FROM REZERVASYON WHERE Tarih BETWEEN %s AND %s", (bugun_bas, bugun_bit))
+    cursor.execute("SELECT Masa_Id, Tarih FROM REZERVASYON WHERE Tarih BETWEEN %s AND %s", (bugun_bas, bugun_bit))
     gunluk_rezler = cursor.fetchall()
     for m in masalar:
         m['durum'] = 'bos'
         for r in gunluk_rezler:
-            if r['Masa_ID'] == m['Masa_ID']:
+            if r['Masa_Id'] == m['Masa_Id']:
                 if simdi >= r['Tarih'] - timedelta(hours=1) and simdi <= r['Tarih'] + timedelta(hours=2):
                     m['durum'] = 'dolu'
                 elif r['Tarih'] > simdi:
@@ -43,7 +43,7 @@ def index():
 def masalar_listesi():
     db = get_db()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM MASA ORDER BY Masa_ID ASC")
+    cursor.execute("SELECT * FROM MASA ORDER BY Masa_Id ASC")
     masalar = cursor.fetchall()
     cursor.close()
     db.close()
@@ -59,7 +59,7 @@ def menu_listesi():
     db.close()
     return render_template('menu.html', urunler=urunler, sayfa='menu')
 
-# --- SİPARİŞLER / ADİSYON LİSTESİ (LEFT JOIN İLE TÜM MASALAR) ---
+# --- SİPARİŞLER / ADİSYON LİSTESİ---
 @app.route('/siparisler')
 def siparis_listesi():
     db = get_db()
@@ -67,10 +67,10 @@ def siparis_listesi():
     try:
         # INNER JOIN yerine LEFT JOIN koyduk ki boş masalar da listede gelsin ve ürün eklenebilsin!
         query = """
-            SELECT m.Masa_ID AS Masa_Id, m.Konum, s.Siparis_Id, COALESCE(s.Tutar, 0.00) AS Tutar
+            SELECT m.Masa_Id AS Masa_Id, m.Konum, s.Siparis_Id, COALESCE(s.Tutar, 0.00) AS Tutar
             FROM MASA m
-            LEFT JOIN SIPARIS s ON m.Masa_ID = s.Masa_Id
-            ORDER BY m.Masa_ID ASC
+            LEFT JOIN SIPARIS s ON m.Masa_Id = s.Masa_Id
+            ORDER BY m.Masa_Id ASC
         """
         cursor.execute(query)
         siparisler = cursor.fetchall()
@@ -117,13 +117,13 @@ def rezervasyon_olustur():
     db = get_db()
     cursor = db.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT Kapasite, Konum FROM MASA WHERE Masa_ID = %s", (ana_masa_id,))
+        cursor.execute("SELECT Kapasite, Konum FROM MASA WHERE Masa_Id = %s", (ana_masa_id,))
         body_masa = cursor.fetchone()
         if not body_masa:
             flash(f"❌ Hata: {ana_masa_id} numaralı masa bulunamadı!", "danger")
             return redirect(url_for('index'))
 
-        check_query = "SELECT * FROM REZERVASYON WHERE Masa_ID = %s AND Tarih BETWEEN %s AND %s"
+        check_query = "SELECT * FROM REZERVASYON WHERE Masa_Id = %s AND Tarih BETWEEN %s AND %s"
         cursor.execute(check_query, (ana_masa_id, alt_limit, ust_limit))
         if cursor.fetchone():
             flash(f"❌ Çakışma! Seçilen Masa {ana_masa_id} o saatte zaten rezerve edilmiş.", "danger")
@@ -134,13 +134,13 @@ def rezervasyon_olustur():
 
         if kalan_kisi > 0:
             otomatik_masa_query = """
-                SELECT Masa_ID, Kapasite,
+                SELECT Masa_Id, Kapasite,
                        (CASE WHEN Konum = %s THEN 0 ELSE 1 END) AS yakinlik_onceligi
                 FROM MASA 
-                WHERE Masa_ID != %s AND Masa_ID NOT IN (
-                    SELECT Masa_ID FROM REZERVASYON WHERE Tarih BETWEEN %s AND %s
+                WHERE Masa_Id != %s AND Masa_Id NOT IN (
+                    SELECT Masa_Id FROM REZERVASYON WHERE Tarih BETWEEN %s AND %s
                 )
-                ORDER BY yakinlik_onceligi ASC, Masa_ID ASC
+                ORDER BY yakinlik_onceligi ASC, Masa_Id ASC
             """
             cursor.execute(otomatik_masa_query, (body_masa['Konum'], ana_masa_id, alt_limit, ust_limit))
             kullanilabilir_masalar = cursor.fetchall()
@@ -148,7 +148,7 @@ def rezervasyon_olustur():
             for masa in kullanilabilir_masalar:
                 if kalan_kisi <= 0:
                     break
-                ayrilacak_masalar.append(masa['Masa_ID'])
+                ayrilacak_masalar.append(masa['Masa_Id'])
                 kalan_kisi -= masa['Kapasite']
 
             if kalan_kisi > 0:
@@ -185,7 +185,7 @@ def kapasite_kontrol():
     
     db = get_db()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT Kapasite, Konum FROM MASA WHERE Masa_ID = %s", (masa_id,))
+    cursor.execute("SELECT Kapasite, Konum FROM MASA WHERE Masa_Id = %s", (masa_id,))
     masa_kontrol = cursor.fetchone()
     
     bos_masalar = []
@@ -196,13 +196,13 @@ def kapasite_kontrol():
         ust_limit = secilen_zaman + timedelta(hours=2)
         
         query = """
-            SELECT Masa_ID, Kapasite, Konum,
+            SELECT Masa_Id, Kapasite, Konum,
                    (CASE WHEN Konum = %s THEN 0 ELSE 1 END) AS yakinlik_onceligi
             FROM MASA 
-            WHERE Masa_ID != %s AND Masa_ID NOT IN (
-                SELECT Masa_ID FROM REZERVASYON WHERE Tarih BETWEEN %s AND %s
+            WHERE Masa_Id != %s AND Masa_Id NOT IN (
+                SELECT Masa_Id FROM REZERVASYON WHERE Tarih BETWEEN %s AND %s
             )
-            ORDER BY yakinlik_onceligi ASC, Masa_ID ASC
+            ORDER BY yakinlik_onceligi ASC, Masa_Id ASC
         """
         cursor.execute(query, (masa_kontrol['Konum'], masa_id, alt_limit, ust_limit))
         bos_masalar = cursor.fetchall()
@@ -214,7 +214,7 @@ def kapasite_kontrol():
         return {"uygun": False, "kapasite": masa_kontrol['Kapasite'], "bos_masalar": bos_masalar}
     return {"uygun": True}
 
-# --- ADİSYON / SİPARİŞ ÜRÜN EKLEME (MASA_ID ALAN GÜVENLİ YAPI) ---
+# --- ADİSYON / SİPARİŞ ÜRÜN EKLEME ---
 @app.route('/adisyon-urun-ekle/<int:masa_id>', methods=['POST'])
 def adisyon_urun_ekle(masa_id):
     urun_id = request.form.get('urun_id')
@@ -290,7 +290,7 @@ def siparis_detay_sil(detay_id):
         db.close()
     return redirect(url_for('siparis_listesi'))
 
-# --- HESAP KAPATMA (MASAYI, MÜŞTERİYİ VE REZERVASYONU ZİNCİRLEME TEMİZLEYEN YAPI) ---
+# --- HESAP KAPATMA ---
 @app.route('/adisyon-kapat/<int:siparis_id>', methods=['POST'])
 def adisyon_kapat(siparis_id):
     db = get_db()
@@ -305,7 +305,7 @@ def adisyon_kapat(siparis_id):
             masa_id = siparis['Masa_Id']
             
             # Masadaki aktif müşteriyi buluyoruz
-            cursor.execute("SELECT Musteri_ID FROM REZERVASYON WHERE Masa_ID = %s", (masa_id,))
+            cursor.execute("SELECT Musteri_ID FROM REZERVASYON WHERE Masa_Id = %s", (masa_id,))
             rezervasyon = cursor.fetchone()
             
             # 1. Sipariş Kalemlerini ve Siparişi temizliyoruz
@@ -318,7 +318,7 @@ def adisyon_kapat(siparis_id):
                 cursor.execute("DELETE FROM REZERVASYON WHERE Musteri_ID = %s", (musteri_id,))
                 cursor.execute("DELETE FROM MUSTERI WHERE Musteri_ID = %s", (musteri_id,))
             else:
-                cursor.execute("DELETE FROM REZERVASYON WHERE Masa_ID = %s", (masa_id,))
+                cursor.execute("DELETE FROM REZERVASYON WHERE Masa_Id = %s", (masa_id,))
             
             db.commit()
             flash("💳 Hesap Ödendi! Masa boşaltıldı, siparişler ve rezervasyon veritabanından tamamen temizlendi.", "success")
@@ -460,15 +460,15 @@ def masa_ekle():
     cursor = db.cursor(dictionary=True)
     try:
         id_query = """
-            SELECT (CASE WHEN NOT EXISTS(SELECT 1 FROM MASA WHERE Masa_ID = 1) THEN 1
-            ELSE COALESCE((SELECT MIN(m1.Masa_ID + 1) FROM MASA m1 
-                           WHERE NOT EXISTS (SELECT 1 FROM MASA m2 WHERE m2.Masa_ID = m1.Masa_ID + 1)), 1)
+            SELECT (CASE WHEN NOT EXISTS(SELECT 1 FROM MASA WHERE Masa_Id = 1) THEN 1
+            ELSE COALESCE((SELECT MIN(m1.Masa_Id + 1) FROM MASA m1 
+                           WHERE NOT EXISTS (SELECT 1 FROM MASA m2 WHERE m2.Masa_Id = m1.Masa_Id + 1)), 1)
             END) AS yeni_id
         """
         cursor.execute(id_query)
         res = cursor.fetchone()
         yeni_id = res['yeni_id'] if res else 1
-        cursor.execute("INSERT INTO MASA (Masa_ID, Kapasite, Konum) VALUES (%s, %s, %s)", (yeni_id, kapasite, konum))
+        cursor.execute("INSERT INTO MASA (Masa_Id, Kapasite, Konum) VALUES (%s, %s, %s)", (yeni_id, kapasite, konum))
         db.commit()
         flash(f"✨ Masa {yeni_id} ({konum}) başarıyla sisteme eklendi.", "success")
     except Exception as e:
@@ -493,8 +493,8 @@ def masa_sil(masa_id):
         query_detay_sil = "DELETE sd FROM siparis_detay sd INNER JOIN SIPARIS s ON sd.Siparis_Id = s.Siparis_Id WHERE s.Masa_Id = %s"
         cursor.execute(query_detay_sil, (masa_id,))
         cursor.execute("DELETE FROM SIPARIS WHERE Masa_Id = %s", (masa_id,))
-        cursor.execute("DELETE FROM REZERVASYON WHERE Masa_ID = %s", (masa_id,))
-        cursor.execute("DELETE FROM MASA WHERE Masa_ID = %s", (masa_id,))
+        cursor.execute("DELETE FROM REZERVASYON WHERE Masa_Id = %s", (masa_id,))
+        cursor.execute("DELETE FROM MASA WHERE Masa_Id = %s", (masa_id,))
         cursor.execute("SET FOREIGN_KEY_CHECKS = 1;")
         db.commit()
         flash(f"🗑️ Masa {masa_id} ve bağlı tüm kayıtları başarıyla silindi.", "success")

@@ -3,17 +3,18 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Siparişler | MAYA</title>
+    <title>Siparişler | RESTORAN</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=DM+Sans:wght@400;500&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
     <aside class="sidebar">
-        <div class="logo" style="padding: 30px 25px;">
-            <div style="font-family: 'Playfair Display'; font-size: 24px; color: #c9a84c;">MAYA</div>
+        <div class="logo">
+            <div class="logo-name">RESTORAN</div>
+            <div class="logo-sub">YÖNETİM SİSTEMİ</div>
         </div>
         <nav>
             <a href="/" class="nav-item">📊 Genel Bakış</a>
@@ -25,14 +26,13 @@
     </aside>
 
     <main class="main" style="margin-left: 240px; padding: 40px; flex: 1;">
-        <h2 style="font-family: 'Playfair Display'; color: #c9a84c; margin-bottom: 30px;">🧾 Tüm Masalar ve Aktif
-            Adisyonlar</h2>
+        <h2 style="font-family: 'Playfair Display'; color: #c9a84c; margin-bottom: 30px;">🧾 Tüm Masalar ve Aktif Adisyonlar</h2>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category, message in messages %}
         <div
-            style="padding: 15px; margin-bottom: 20px; border-radius: 8px; background: #2e7d32#c0453a; color: white; font-weight: bold;">
+            style="padding: 15px; margin-bottom: 20px; border-radius: 8px; background: #c0453a; color: white; font-weight: bold;">
             {{ message }}
         </div>
         {% endfor %}
@@ -106,8 +106,7 @@
                                 </form>
                             </td>
                             <td style="padding: 15px 0; text-align: right; color: #8a8778;">₺{{ k.Fiyat }}</td>
-                            <td style="padding: 15px 0; text-align: right; font-weight: bold; color: #c9a84c;">₺{{
-                                k.Ara_Toplam }}</td>
+                            <td style="padding: 15px 0; text-align: right; font-weight: bold; color: #c9a84c;">₺{{ k.Ara_Toplam }}</td>
                             <td style="padding: 15px 0; text-align: right;">
                                 <form action="/siparis-detay-sil/{{ k.Detay_Id }}" method="POST">
                                     <button type="submit"
@@ -119,8 +118,7 @@
                     </tbody>
                 </table>
                 {% else %}
-                <div style="color: #666; font-style: italic; font-size: 13px; padding: 5px 0;">Bu masada henüz açık bir
-                    adisyon veya sipariş bulunmuyor. Yukarıdan ürün ekleyerek adisyonu başlatabilirsiniz.</div>
+                <div style="color: #666; font-style: italic; font-size: 13px; padding: 5px 0;">Bu masada henüz açık bir adisyon veya sipariş bulunmuyor. Yukarıdan ürün ekleyerek adisyonu başlatabilirsiniz.</div>
                 {% endif %}
             </div>
             {% endfor %}

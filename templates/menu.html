@@ -3,17 +3,18 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Menü | MAYA</title>
+    <title>Menü | RESTORAN</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=DM+Sans:wght@400;500&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
     <aside class="sidebar">
-        <div class="logo" style="padding: 30px 25px;">
-            <div style="font-family: 'Playfair Display'; font-size: 24px; color: #c9a84c;">MAYA</div>
+        <div class="logo">
+            <div class="logo-name">RESTORAN</div>
+            <div class="logo-sub">YÖNETİM SİSTEMİ</div>
         </div>
         <nav>
             <a href="/" class="nav-item">📊 Genel Bakış</a>
@@ -74,11 +75,9 @@
                         <td style="padding: 15px 10px; vertical-align: middle;">
                             <div style="font-weight: 500; color: white;">{{ u.urun_adi }}</div>
                             {% if u.aciklama %}
-                            <div style="font-size: 12px; color: #8a8778; margin-top: 4px; font-style: italic;">{{
-                                u.aciklama }}</div>
+                            <div style="font-size: 12px; color: #8a8778; margin-top: 4px; font-style: italic;">{{ u.aciklama }}</div>
                             {% else %}
-                            <div style="font-size: 12px; color: #444; margin-top: 4px; font-style: italic;">Açıklama yok
-                            </div>
+                            <div style="font-size: 12px; color: #444; margin-top: 4px; font-style: italic;">Açıklama yok</div>
                             {% endif %}
                         </td>
                         <td style="padding: 15px 10px; vertical-align: middle;">
@@ -98,8 +97,7 @@
                             <form action="/urun-sil/{{ u.urun_id }}" method="POST"
                                 onsubmit="return confirm('Bu ürünü silmek istediğinize emin misiniz?');">
                                 <button type="submit"
-                                    style="background: none; border: none; color: #c0453a; cursor: pointer; font-weight: bold;">✕
-                                    SİL</button>
+                                    style="background: none; border: none; color: #c0453a; cursor: pointer; font-weight: bold;">✕ SİL</button>
                             </form>
                         </td>
                     </tr>
